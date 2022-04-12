@@ -87,6 +87,7 @@ int main()
                     data[make_pair(date, loc)] = cases;
                     //data2[date + loc] = cases;
                 }
+
                 break;
 
             }
@@ -137,6 +138,30 @@ int main()
     cout << endl << "Enter Travel dates in YYYY-MM-DD format" << endl;
     cin >> start;
     cin >> end;
+
+    unordered_map<string, float> riskLevel;
+
+    countiesIter = counties.begin();
+
+    while (countiesIter != counties.end()) {
+        pair<string, string> key = make_pair(start, *countiesIter);
+        auto numCase1 = data.find(key);
+
+        key = make_pair(end, *countiesIter);
+        auto numCase2 = data.find(key);
+
+        riskLevel[*countiesIter] = (float)(numCase2->second) / (float)(numCase1->second);
+
+        countiesIter++;
+    }
+
+    auto iterRL = riskLevel.begin();
+
+    while (iterRL != riskLevel.end()) {
+        cout << iterRL->first << "   " << iterRL->second << endl;
+        iterRL++;
+    }
+
 
     return 0;
 
