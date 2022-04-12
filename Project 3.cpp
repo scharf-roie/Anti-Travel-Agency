@@ -150,7 +150,9 @@ int main()
         key = make_pair(end, *countiesIter);
         auto numCase2 = data.find(key);
 
-        riskLevel[*countiesIter] = (float)(numCase2->second) / (float)(numCase1->second);
+        if (numCase1 != data.end() && numCase2 != data.end()) {
+            riskLevel[*countiesIter] = (float)(numCase2->second) / (float)(numCase1->second);
+        }
 
         countiesIter++;
     }
