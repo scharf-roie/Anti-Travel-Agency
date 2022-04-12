@@ -8,10 +8,17 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <stdlib.h>
+#include <cstdlib>
 
 #pragma comment(lib, "urlmon.lib")
 
 using namespace std;
+
+
+int ascending(const void* x, const void* y) {
+    return (*(float*)(x)*100000 - *(float*)(y)*100000);
+}
 
 
 int main()
@@ -140,7 +147,12 @@ int main()
     cin >> end;
 
     unordered_map<string, float> riskLevel;
+    unordered_map<float, string> riskLevelInv;
 
+    float* arr1 = new float[counties.size()];
+    float* arr2 = new float[counties.size()];
+
+    int c = 0;
     countiesIter = counties.begin();
 
     while (countiesIter != counties.end()) {
@@ -151,7 +163,12 @@ int main()
         auto numCase2 = data.find(key);
 
         if (numCase1 != data.end() && numCase2 != data.end()) {
+            float risk = (float)(numCase2->second) / (float)(numCase1->second);
             riskLevel[*countiesIter] = (float)(numCase2->second) / (float)(numCase1->second);
+            riskLevelInv[risk] = *countiesIter;
+            arr1[c] = risk;
+            arr2[c] = risk;
+            c++;
         }
 
         countiesIter++;
@@ -163,6 +180,14 @@ int main()
         cout << iterRL->first << "   " << iterRL->second << endl;
         iterRL++;
     }
+
+    qsort(arr1, counties.size(), sizeof(float), ascending);
+
+    for (int i = 0; i < counties.size(); i++)
+        cout << arr1[i] << " ";
+
+    cout << endl <<"The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
+
 
 
     return 0;
