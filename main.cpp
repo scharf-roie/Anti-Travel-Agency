@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <cstdlib>
 
-#pragma comment(lib, "urlmon.lib")
+//hello lol
+//#pragma comment(lib, "urlmon.lib")
+#pragma comment(lib, "-lurlmon")
 
 using namespace std;
 
