@@ -113,12 +113,24 @@ int main()
 
     cout << rowNum << endl;
 
+
+    //Checking to see what the containers look like
+
+    /*
     auto iter = data.begin();
 
     while (iter != data.end()) {
         //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
         iter++;
     }
+
+    auto iter2 = data2.begin();
+
+    while (iter2 != data2.end()) {
+    //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
+    iter2++;
+
+    }*/
 
     cout << data.size() << endl;
 
@@ -131,29 +143,25 @@ int main()
         countiesIter++;
     }
 
-    /*auto iter2 = data2.begin();
 
-    while (iter2 != data2.end()) {
-        //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
-        iter2++;
-    }*/
 
     file.close();
 
-    string start, end;
-    cout << endl << "Enter Travel dates in YYYY-MM-DD format" << endl;
-    cin >> start;
-    cin >> end;
+    cout << endl << "For how many days will you travel?" << endl;
+
     int len;
 
-    //start of me messing around
     cin >> len;
 
     map<pair<string, string>, int>::iterator* iterList = new map<pair<string, string>, int>::iterator[len];
-    map < string, map<pair<string, string>, float> > superMap;
+    map < string, map<pair<string, string>, float> > generalRiskLevel;
+    //map <  map<pair<string, string>, float>, string > generalRiskLevelInv;
 
-    iter = data.begin();
-    int i = 0;
+
+    float* arrRiskLevel = new float[data.size()];
+
+    auto iter = data.begin();
+    int i = 0, arrCounter = 0;
     bool store = false;
 
     while (iter != data.end()) {
@@ -182,8 +190,14 @@ int main()
 
         if (iterList[c]->first.first.compare(iter->first.first) == 0) {
             if (store) {
-                float risk = (float)iter->second / float(iterList[c]->second);
-                superMap[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
+                int startDate = iterList[c]->second;
+                if (startDate == 0) {
+                    startDate++;
+                }
+                float risk = (float)iter->second / startDate;
+                generalRiskLevel[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
+                arrRiskLevel[arrCounter] = risk;
+                arrCounter++;
             }
         }
         else {
@@ -194,9 +208,10 @@ int main()
     }
 
 
-    auto superIter = superMap.begin();
+    auto superIter = generalRiskLevel.begin();
     int size = 0;
-    while (superIter != superMap.end()) {
+
+    while (superIter != generalRiskLevel.end()) {
         auto i2 = superIter->second.begin();
 
         //cout << endl << superIter->second.size() << endl;
@@ -212,9 +227,35 @@ int main()
 
     cout << endl << size << endl;
 
-    return 0;
+    //This isnt working properly
 
-    //end of me messing around
+    /*
+    qsort(arrRiskLevel, data.size(), sizeof(float), ascending);
+
+    for (int i = 0; i < counties.size(); i++)
+        cout << arrRiskLevel[i] << " ";
+
+    superIter = generalRiskLevel.begin();
+
+    while (superIter != generalRiskLevel.end()) {
+        auto i2 = superIter->second.begin();
+
+        while (i2 != superIter->second.end()) {
+            if (i2->second == arrRiskLevel[0]) {
+                cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
+            }
+            i2++;
+        }
+        superIter++;
+
+    }*/
+
+    string start, end;
+
+    cout << endl << "Enter Travel dates in YYYY-MM-DD format" << endl;
+
+    cin >> start;
+    cin >> end;
 
     unordered_map<string, float> riskLevel;
     unordered_map<float, string> riskLevelInv;
@@ -257,9 +298,10 @@ int main()
 
     qsort(arr1, counties.size(), sizeof(float), ascending);
 
+    /*
     for (int i = 0; i < counties.size(); i++)
         cout << arr1[i] << " ";
-
+    */
     cout << endl <<"The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
 
     return 0;
