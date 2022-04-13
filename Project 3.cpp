@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <stdlib.h>
-#include <cstdlib>
 
 #pragma comment(lib, "urlmon.lib")
 
@@ -91,7 +90,7 @@ int main()
                 //  cout << "    " << entry << endl;
                 if (!entry.empty()) {
                     cases = stoi(entry);
-                    data[make_pair(date, loc)] = cases;
+                    data[make_pair(loc, date)] = cases;
                     //data2[date + loc] = cases;
                 }
 
@@ -117,7 +116,7 @@ int main()
     auto iter = data.begin();
 
     while (iter != data.end()) {
-       // cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
+        //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
         iter++;
     }
 
@@ -145,6 +144,77 @@ int main()
     cout << endl << "Enter Travel dates in YYYY-MM-DD format" << endl;
     cin >> start;
     cin >> end;
+    int len;
+
+    //start of me messing around
+    cin >> len;
+
+    map<pair<string, string>, int>::iterator* iterList = new map<pair<string, string>, int>::iterator[len];
+    map < string, map<pair<string, string>, float> > superMap;
+
+    iter = data.begin();
+    int i = 0;
+    bool store = false;
+
+    while (iter != data.end()) {
+        int c = i;
+
+        if (store)
+            c++;
+
+        iterList[i] = iter;
+        i++;
+        iter++;
+
+        auto temp = iter;
+        for (int j = 0; j < len; j++) {
+            temp++;
+        }
+
+        if (temp == data.end())
+            break;
+
+        if (i == len) {
+            i = 0;
+            c = i;
+            store = true;
+        }
+
+        if (iterList[c]->first.first.compare(iter->first.first) == 0) {
+            if (store) {
+                float risk = (float)iter->second / float(iterList[c]->second);
+                superMap[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
+            }
+        }
+        else {
+            i = 0;
+            store = false;
+        }
+
+    }
+
+
+    auto superIter = superMap.begin();
+    int size = 0;
+    while (superIter != superMap.end()) {
+        auto i2 = superIter->second.begin();
+
+        //cout << endl << superIter->second.size() << endl;
+        size += superIter->second.size();
+
+        while (i2 != superIter->second.end()) {
+            cout << superIter-> first << "  "<< i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
+            i2++;
+        }
+        superIter++;
+
+    }
+
+    cout << endl << size << endl;
+
+    return 0;
+
+    //end of me messing around
 
     unordered_map<string, float> riskLevel;
     unordered_map<float, string> riskLevelInv;
@@ -156,15 +226,19 @@ int main()
     countiesIter = counties.begin();
 
     while (countiesIter != counties.end()) {
-        pair<string, string> key = make_pair(start, *countiesIter);
+        pair<string, string> key = make_pair(*countiesIter, start);
         auto numCase1 = data.find(key);
 
-        key = make_pair(end, *countiesIter);
+        key = make_pair(*countiesIter, end);
         auto numCase2 = data.find(key);
 
         if (numCase1 != data.end() && numCase2 != data.end()) {
-            float risk = (float)(numCase2->second) / (float)(numCase1->second);
-            riskLevel[*countiesIter] = (float)(numCase2->second) / (float)(numCase1->second);
+            int start = numCase1->second, end = numCase2->second;
+            if (start == 0) {
+                start++;
+            }
+            float risk = (float)(end) / (float)(start);
+            riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
             arr2[c] = risk;
@@ -187,8 +261,6 @@ int main()
         cout << arr1[i] << " ";
 
     cout << endl <<"The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
-
-
 
     return 0;
 
