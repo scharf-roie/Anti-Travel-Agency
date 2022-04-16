@@ -14,16 +14,51 @@
 
 using namespace std;
 
+struct riskInformation {
+    int numCases; //9 value
+    float positivityRatio; //26  ratio [0,1] //prety sparse, not good data it seems
+    float caseDensity; //28  ratio [cases/100k people]
+    float infectionRate; //30 num cases that arise from a given infection
+    float vaccinationsCompleted; //37 ratio [0,1]
+    float casePerHundredK; //44 weekly new cases per 100k
+
+    riskInformation(int a, float b, float c, float d, float e, float f) {
+        numCases = a;
+        positivityRatio = b;
+        caseDensity = c;
+        infectionRate = d;
+        vaccinationsCompleted = e;
+        casePerHundredK = f;
+
+
+    }
+
+
+
+
+};
 
 int ascending(const void* x, const void* y) {
     return (*(float*)(x)*100000 - *(float*)(y)*100000);
 }
 
+float calculateRiskLevel(riskInformation* r1, riskInformation* r2) {
+    float caseRatio = ( (float) r2->numCases / (float) r1->numCases);
+    float caseGrowthFactor = ((r2->casePerHundredK - r1->casePerHundredK) / (r2->caseDensity - r1->caseDensity + 1));
+    float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2) * (r2->caseDensity - r1->caseDensity);
+
+   // cout << caseRatio << "  " << caseGrowthFactor << "   " << vaccineNormalization << endl;
+
+    float risk =  caseRatio + caseGrowthFactor  - vaccineNormalization;
+
+    return risk;
+}
 
 int main()
 {
     std::cout << "Hello World!\n";
 
+    cout << "The good version \n";
 
     // the URL to download from 
     string state;
@@ -61,7 +96,7 @@ int main()
 
     string line;
     int rowNum = 0;
-    map<pair<string, string>, int> data;
+    map<pair<string, string>, riskInformation*> data; //class RiskInformation numCses, case dneisty vaacinantiono
     unordered_set<string> counties;
 
     getline(file, line);
@@ -70,41 +105,72 @@ int main()
 
         stringstream row(line);
         string entry, date, loc;
-        int cases, ctr = 0;
+        int ctr = 0;
+        int cases = 1;
+        float positivityRatio_ = 0; //26
+        float caseDensity_ = 0; //28
+        float infectionRate_ = 0; //30
+        float vaccinationsCompleted_ = 0; //37
+        float casePerHundredK_ = 0; //44
+        bool hasData = false;
 
         while (getline(row, entry, ',')) {
 
             ctr++;
 
             if (ctr == 1) {
-                // cout << entry;
                 date = entry;
             }
             else if (ctr == 4) {
-                //cout << entry << endl;
                 counties.insert(entry);
                 loc = entry;
 
             }
             else if (ctr == 9) {
-                //  cout << "    " << entry << endl;
                 if (!entry.empty()) {
-                    cases = stoi(entry);
-                    data[make_pair(loc, date)] = cases;
-                    //data2[date + loc] = cases;
+                    cases += stoi(entry);
+                    hasData = true;
                 }
-
-                break;
 
             }
 
+            else if (ctr == 26) {
+                if (!entry.empty()) {
+                    positivityRatio_ = stof(entry);
+                }
+            }
+            else if (ctr == 28) {
+                if (!entry.empty()) {
+                    caseDensity_ = stof(entry);
+
+                }
+            }
+            else if (ctr == 30) {
+                if (!entry.empty()) {
+                    infectionRate_ = stof(entry);
+
+                }
+            }
+            else if (ctr == 37) {
+                if (!entry.empty()) {
+                    vaccinationsCompleted_ = stof(entry);
+                }
+            }
+            else if (ctr == 44) {
+                if (!entry.empty()) {
+                    casePerHundredK_ = stof(entry);
+                }
+
+                data[make_pair(loc, date)] = new riskInformation(cases, positivityRatio_, caseDensity_, infectionRate_, vaccinationsCompleted_, casePerHundredK_);
+                break;
+            }
 
         }
-        //cout << str << endl;
         rowNum++;
 
+
         if (rowNum == 100000) {
-            break;
+            //break;
         }
 
     }
@@ -153,12 +219,14 @@ int main()
 
     cin >> len;
 
-    map<pair<string, string>, int>::iterator* iterList = new map<pair<string, string>, int>::iterator[len];
+    map<pair<string, string>, riskInformation*>::iterator* iterList = new map<pair<string, string>, riskInformation*>::iterator[len];
     map < string, map<pair<string, string>, float> > generalRiskLevel;
     //map <  map<pair<string, string>, float>, string > generalRiskLevelInv;
 
 
-    float* arrRiskLevel = new float[data.size()];
+    float* arrRiskLevel = new float[data.size() - len];
+
+   
 
     auto iter = data.begin();
     int i = 0, arrCounter = 0;
@@ -190,11 +258,15 @@ int main()
 
         if (iterList[c]->first.first.compare(iter->first.first) == 0) {
             if (store) {
-                int startDate = iterList[c]->second;
+
+                /*
+                int startDate = iterList[c]->second; //risk
                 if (startDate == 0) {
                     startDate++;
                 }
-                float risk = (float)iter->second / startDate;
+                float risk = (float)iter->second / startDate;*/
+
+                float risk = calculateRiskLevel(iterList[c]->second, iter->second);
                 generalRiskLevel[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
                 arrRiskLevel[arrCounter] = risk;
                 arrCounter++;
@@ -274,11 +346,16 @@ int main()
         auto numCase2 = data.find(key);
 
         if (numCase1 != data.end() && numCase2 != data.end()) {
+
+            /*
             int start = numCase1->second, end = numCase2->second;
             if (start == 0) {
                 start++;
             }
-            float risk = (float)(end) / (float)(start);
+            float risk = (float)(end) / (float)(start);*/
+
+            float risk = calculateRiskLevel(numCase1->second, numCase2->second);
+
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
@@ -302,8 +379,11 @@ int main()
     for (int i = 0; i < counties.size(); i++)
         cout << arr1[i] << " ";
     */
-    cout << endl <<"The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
 
+    //merge arr2
+
+    cout << endl <<"The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
+            
     return 0;
 
 }
