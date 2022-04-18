@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <stdlib.h>
+#include <urlmon.h>
 
 #pragma comment(lib, "urlmon.lib")
 
@@ -47,10 +48,13 @@ float calculateRiskLevel(riskInformation* r1, riskInformation* r2) {
     float caseGrowthFactor = ((r2->casePerHundredK - r1->casePerHundredK) / (r2->caseDensity - r1->caseDensity + 1));
     float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2) * (r2->caseDensity - r1->caseDensity);
 
-   // cout << caseRatio << "  " << caseGrowthFactor << "   " << vaccineNormalization << endl;
+    cout << caseRatio << "  " << caseGrowthFactor << "   " << vaccineNormalization << endl;
 
     float risk =  caseRatio + caseGrowthFactor  - vaccineNormalization;
 
+    if (risk < -1000 || risk > 1000) {
+        return 0;
+    }
     return risk;
 }
 
