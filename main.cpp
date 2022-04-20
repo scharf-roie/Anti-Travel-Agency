@@ -45,6 +45,60 @@ float bucketSort::Sort() {
 
 }
 
+//vector<float> insertionSort(vector<float> inputV) {
+//
+//    vector<float> rVect;
+//
+//    for (int i = 0; i < inputV.size(); i++) {
+//
+//        float useVal = inputV.at(i);
+//
+//        if (rVect.size() != 0) {
+//            for (int j = i; j > 0; j--) {
+//                if (j = inputV.size() - 1) {
+//                    break;
+//                }
+//                else if(inputV.at(j - 1))
+//            }
+//        }
+//
+//        rVect.push_back(useVal) {
+//
+//        }
+//    }
+//
+//}
+
+vector<float> bubbleSort(vector<float> inputV) {
+
+    //vector<float> rVect;
+
+    bool isSwap = true;
+
+    while (isSwap)
+    {
+        
+        for (int s = 0; s < inputV.size() - 1; s++) {
+            isSwap = false;
+            for (int i = 0; i < inputV.size() - s - 1; i++) {
+                if (inputV.at(i) > inputV.at(i + 1)) {
+                    
+                    isSwap = true;
+                    
+                    int tempLesser = inputV.at(i + 1);
+
+                    inputV.at(i + 1) = inputV.at(i);
+                    inputV.at(i) = tempLesser;
+                }
+            }
+        }
+
+    }
+
+    return inputV;
+
+}
+
 float bucketSort::Sort(int sizeBucket) {
 
     vector<vector<float>> returnVec(sizeBucket);
@@ -75,7 +129,7 @@ float bucketSort::Sort(int sizeBucket) {
     }
 
     for (int j = 0; j < returnVec.size(); j++) {
-        sort(returnVec.at(j).begin(), returnVec.at(j).end());
+        returnVec.at(j) = bubbleSort(returnVec.at(j));
     }
 
 
@@ -432,8 +486,8 @@ int main()
             i2++;
         }
         superIter++;
-    }*/
-
+    }
+    */
     string start, end;
 
     cout << endl << "Enter Travel dates in YYYY-MM-DD format" << endl;
@@ -525,6 +579,11 @@ int main()
     //qsort(arr1, counties.size(), sizeof(float), ascending);
     //cout << endl << "The county with the lowest risk using quick is : " << riskLevelInv.find(arr1[0])->second << endl;
 
+<<<<<<< HEAD
+    cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(ret)->second << endl;
+    //cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
+=======
+>>>>>>> e9a29b940fba5d735d161e7372997e1b2b7e6449
 
     return 0;
 
