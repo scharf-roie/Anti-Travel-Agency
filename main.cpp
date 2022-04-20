@@ -53,11 +53,11 @@ float bucketSort::Sort(int sizeBucket) {
 
     for (int i = 0; i < myVect.size(); i++) {
 
-        
+
         int bucketPos = sizeBucket * (myVect.at(i));
 
         //cout << bucketPos;
-        
+
         if (bucketPos <= 0) {
             cout << "\ninserting float smaller than bucket: " << myVect.at(i);
             returnVec.at(0).push_back(myVect.at(i));
@@ -78,12 +78,12 @@ float bucketSort::Sort(int sizeBucket) {
         sort(returnVec.at(j).begin(), returnVec.at(j).end());
     }
 
-    
+
     for (int k = 0; k < sizeBucket; k++) {
         //for (int l = 0; l < returnVec.at(k).size(); l++) {
-            if (returnVec.at(k).size() > 0) {
-                finalVec.at(numOfBuckets++) = returnVec.at(k);
-            }
+        if (returnVec.at(k).size() > 0) {
+            finalVec.at(numOfBuckets++) = returnVec.at(k);
+        }
         //}
     }
 
@@ -131,21 +131,23 @@ float calculateRiskLevel(riskInformation* r1, riskInformation* r2) {
     return risk;
 }
 
-int getMax(int arr[], int n) {
+int getMax(vector<int> arr) {
     int max = arr[0];
-    for (unsigned int i = 1; i < n; i++) {
-        if (arr[i] > max)
+    for (unsigned int i = 1; i < arr.size(); i++) {
+        if (arr[i] > max) {
             max = arr[i];
+        }
     }
     return max;
 }
 
-void countSort(int arr[], int n, int exp) {
-    int* newArr = new int[n]; // updated array
+void countSort(vector<int>& arr, int exp) {
+    vector<int> newArr; // updated array
+    newArr.resize(arr.size());
     int temp[10] = { 0 }; //base 10
 
     // Store count of occurrences in count[]
-    for (int i = 0; i < n; i++) { // O(n)
+    for (int i = 0; i < arr.size(); i++) { // O(n)
         temp[(arr[i] / exp) % 10]++; //generate key using  %10
     }
 
@@ -154,23 +156,21 @@ void countSort(int arr[], int n, int exp) {
         temp[i] += temp[i - 1]; //update to be stable sort
     }
 
-    for (int i = n - 1; i >= 0; i--) { //O(n)
+    for (int i = (arr.size() - 1); i >= 0; i--) { //O(n)
         newArr[temp[(arr[i] / exp) % 10] - 1] = arr[i]; //create sorted array
-        temp[(arr[i] / exp) % 10]--; //
+        temp[(arr[i] / exp) % 10]--; 
     }
 
-    arr = newArr;
-
-    for (int i = 0; i < n; i++) { //O(n)
+    for (int i = 0; i < arr.size(); i++) { //O(n)
         arr[i] = newArr[i]; //update arr to be sorted
     }
 }
 
-void radixsort(int arr[], int n) {
-    int max = getMax(arr, n); //O(n)
+void radixsort(vector<int>& arr) {
+    int max = getMax(arr); //O(n)
 
     for (int exp = 1; max / exp > 0; exp *= 10) { //number of passes based on every digit
-        countSort(arr, n, exp);
+        countSort(arr, exp);
     }
 }
 
@@ -445,7 +445,9 @@ int main()
     unordered_map<float, string> riskLevelInv;
 
     float* arr1 = new float[counties.size()];
-    int* arr2 = new int[counties.size()];
+    vector<int> arr2;
+    arr2.resize(counties.size());
+    //int* arr2 = new int[counties.size()];
 
     int c = 0;
     countiesIter = counties.begin();
@@ -467,11 +469,11 @@ int main()
             float risk = (float)(end) / (float)(start);*/
 
             float risk = calculateRiskLevel(numCase1->second, numCase2->second);
-
+            risk = roundf(risk * 100000) / 100000;  //Round to 5 decimals places
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
-            arr2[c] = (int)(risk*100000);
+            arr2[c] = (int)(risk * 100000);
             c++;
         }
 
@@ -498,30 +500,31 @@ int main()
     float ret = myBucket.Sort(10);
 
     //qsort(arr1, counties.size(), sizeof(float), ascending);
-    
-    
+
+
     /*
     for (int i = 0; i < counties.size(); i++)
         cout << arr1[i] << " ";
     */
 
     //radix arr2
-    
-    int n = sizeof(arr2) / sizeof(arr2[0]);
-    radixsort(arr2, n);
-    
-    /* for (int i = 0; i < counties.size(); i++) {
-        cout << ((float)arr2[i] / (float)100000) << " ";
-    }
-    */
-    
-    //cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(((float)arr2[0] / (float)100000))->second << endl;
 
-    
-    cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
+    radixsort(arr2);
 
+    //cout << endl << "BEGIN" << endl;
+
+    //for (int i = 0; i < counties.size(); i++) {
+    //    cout << ((float)arr2[i] / (float)100000) << " ";
+    //}
     
-    cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(ret)->second << endl;
+
+    cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)arr2[0] / (float)100000))->second << endl;
+
+    cout << endl << "The county with the lowest risk using bucket is : " << riskLevelInv.find(ret)->second << endl;
+
+    //qsort(arr1, counties.size(), sizeof(float), ascending);
+    //cout << endl << "The county with the lowest risk using quick is : " << riskLevelInv.find(arr1[0])->second << endl;
+
 
     return 0;
 
