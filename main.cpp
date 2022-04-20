@@ -166,12 +166,42 @@ void countSort(vector<int>& arr, int exp) {
     }
 }
 
-void radixsort(vector<int>& arr) {
+vector<int> radixsort(vector<int> arr) {
     int max = getMax(arr); //O(n)
+    vector<int> negArr;
+    vector<int> posArr;
+    for (unsigned int i = 0; i < arr.size(); i++) {
+        if (arr[i] < 0) {
+            negArr.push_back(arr[i] * -1);
+        }
+        else {
+            posArr.push_back(arr[i]);
+        }
+    }
+    
+    if (negArr.size() > 0) {
+        int negMax = getMax(negArr);
+        for (int exp = 1; negMax / exp > 0; exp *= 10) {
+            countSort(negArr, exp);
+        }
+    }
 
     for (int exp = 1; max / exp > 0; exp *= 10) { //number of passes based on every digit
-        countSort(arr, exp);
+        countSort(posArr, exp);
     }
+    int size = negArr.size();
+    for (unsigned int i = 0; i < arr.size(); i++) {
+        if (i < size) {
+            negArr[i] *= -1;
+        }
+        if (i < posArr.size()) {
+            negArr.push_back(posArr[i]);
+        }
+    }
+    if (negArr.size() > 0) {
+        return negArr;
+    }
+    return posArr;
 }
 
 
@@ -509,7 +539,7 @@ int main()
 
     //radix arr2
 
-    radixsort(arr2);
+    arr2 = radixsort(arr2);
 
     //cout << endl << "BEGIN" << endl;
 
