@@ -121,13 +121,18 @@ int ascending(const void* x, const void* y) {
 
 float calculateRiskLevel(riskInformation* r1, riskInformation* r2) {
     float caseRatio = ((float)r2->numCases / (float)r1->numCases);
-    float caseGrowthFactor = ((r2->casePerHundredK - r1->casePerHundredK) / (r2->caseDensity - r1->caseDensity + 1));
-    float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2) * (r2->caseDensity - r1->caseDensity);
+    float positivityRatioAvg = ((float)r1->positivityRatio + r2->positivityRatio) / 2.0;
+    float caseDensityAvg = ((float)r1->caseDensity + r2->caseDensity) / 2.0;
+    //float caseGrowthFactor = ((r2->casePerHundredK - r1->casePerHundredK) / (r2->caseDensity - r1->caseDensity + 1));
+    float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2.0) * caseDensityAvg;
 
-    // cout << caseRatio << "  " << caseGrowthFactor << "   " << vaccineNormalization << endl;
+    //cout << caseRatio << "  " << positivityRatioAvg  <<  "   " << caseDensityAvg<< "  " << vaccineNormalization << endl;
 
-    float risk = caseRatio + caseGrowthFactor - vaccineNormalization;
+    float risk = caseRatio + positivityRatioAvg + caseDensityAvg - vaccineNormalization;
 
+    if (risk < -1000 || risk > 1000) {
+        return 0;
+    }
     return risk;
 }
 
@@ -172,6 +177,7 @@ void radixsort(vector<int>& arr) {
     for (int exp = 1; max / exp > 0; exp *= 10) { //number of passes based on every digit
         countSort(arr, exp);
     }
+
 }
 
 
@@ -469,11 +475,11 @@ int main()
             float risk = (float)(end) / (float)(start);*/
 
             float risk = calculateRiskLevel(numCase1->second, numCase2->second);
-            risk = roundf(risk * 100000) / 100000;  //Round to 5 decimals places
+            risk = roundf(risk * 10000) / 10000;  //Round to 5 decimals places
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
-            arr2[c] = (int)(risk * 100000);
+            arr2[c] = (int)(risk * 10000);
             c++;
         }
 
@@ -518,7 +524,7 @@ int main()
     //}
     
 
-    cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)arr2[0] / (float)100000))->second << endl;
+    cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)arr2[0] / (float)10000))->second << endl;
 
     cout << endl << "The county with the lowest risk using bucket is : " << riskLevelInv.find(ret)->second << endl;
 
