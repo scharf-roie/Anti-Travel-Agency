@@ -510,9 +510,10 @@ int main()
     int n = sizeof(arr2) / sizeof(arr2[0]);
     radixsort(arr2, n);
     
-    for (int i = 0; i < counties.size(); i++) {
+    /* for (int i = 0; i < counties.size(); i++) {
         cout << ((float)arr2[i] / (float)100000) << " ";
     }
+    */
     
     //cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(((float)arr2[0] / (float)100000))->second << endl;
 
