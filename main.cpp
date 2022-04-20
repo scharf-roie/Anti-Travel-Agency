@@ -18,16 +18,18 @@ using namespace std;
 
 struct bucketSort {
 
-    vector<int> myVect;
+    vector<float> myVect;
     int myCounties;
-    float mySizeOf;
+    //float mySizeOf;
     string directionality;
 
-    bucketSort(vector<int> vect1, int counties, float sizeOf, string ascending) {
+public:
+
+    bucketSort(vector<float> vect1, int counties, string ascending) {
 
         this->myVect = vect1;
         this->myCounties = counties;
-        this->mySizeOf = sizeOf;
+        //this->mySizeOf = sizeOf;
         this->directionality = ascending;
     }
 
@@ -50,16 +52,24 @@ float bucketSort::Sort(int sizeBucket) {
     int numOfBuckets = 0;
 
     for (int i = 0; i < myVect.size(); i++) {
-        int bucketPos = i * myVect.at(sizeBucket);
 
+        
+        int bucketPos = sizeBucket * (myVect.at(i));
+
+        //cout << bucketPos;
+        
         if (bucketPos <= 0) {
-            returnVec.at(0).push_back(myVect.at(sizeBucket));
+            cout << "\ninserting float smaller than bucket: " << myVect.at(i);
+            returnVec.at(0).push_back(myVect.at(i));
         }
-        else if (bucketPos > sizeBucket) {
-            returnVec.at(sizeBucket).push_back(myVect.at(sizeBucket));
+        else if (bucketPos >= sizeBucket) {
+            cout << "\ninserting float bigger than bucket: " << myVect.at(i);
+            returnVec.at(sizeBucket - 1).push_back(myVect.at(i));
         }
         else {
-            returnVec.at(float(bucketPos)).push_back(myVect.at(sizeBucket));
+            float insertFloat = myVect.at(i);
+            cout << "\ninserting float else: " << insertFloat;
+            returnVec.at(float(bucketPos)).push_back(insertFloat);
         }
 
     }
@@ -71,7 +81,7 @@ float bucketSort::Sort(int sizeBucket) {
     
     for (int k = 0; k < sizeBucket; k++) {
         //for (int l = 0; l < returnVec.at(k).size(); l++) {
-            if (returnVec.at(k).at(0) != NULL) {
+            if (returnVec.at(k).size() > 0) {
                 finalVec.at(numOfBuckets++) = returnVec.at(k);
             }
         //}
@@ -349,7 +359,7 @@ int main()
     while (superIter != generalRiskLevel.end()) {
         auto i2 = superIter->second.begin();
 
-        //cout << endl << superIter->second.size() << endl;
+        cout << endl << superIter->second.size() << endl;
         size += superIter->second.size();
 
         while (i2 != superIter->second.end()) {
@@ -431,7 +441,19 @@ int main()
         iterRL++;
     }
 
-    qsort(arr1, counties.size(), sizeof(float), ascending);
+    int iterArray = 0;
+    vector<float> bucketSortVect;
+    while (iterArray < counties.size()) {
+
+        bucketSortVect.push_back(arr1[iterArray]);
+
+        iterArray++;
+    }
+
+    bucketSort myBucket = bucketSort::bucketSort(bucketSortVect, counties.size(), "ascending");
+    float ret = myBucket.Sort(10);
+
+    //qsort(arr1, counties.size(), sizeof(float), ascending);
 
     /*
     for (int i = 0; i < counties.size(); i++)
@@ -440,7 +462,7 @@ int main()
 
     //merge arr2
 
-    cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(arr1[0])->second << endl;
+    cout << endl << "The county with the lowest risk is : " << riskLevelInv.find(ret)->second << endl;
 
     return 0;
 
