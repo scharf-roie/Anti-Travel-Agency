@@ -389,7 +389,7 @@ int main()
                     arrRiskLevelBucket.push_back(risk);
                 }
 
-                //cout << risk << endl;
+   
 
             }
         }
@@ -408,7 +408,6 @@ int main()
     while (superIter != generalRiskLevel.end()) {
         auto i2 = superIter->second.begin();
 
-        cout << endl << superIter->second.size() << endl;
         size += superIter->second.size();
 
         while (i2 != superIter->second.end()) {
@@ -419,25 +418,21 @@ int main()
 
     }
 
-    cout << endl << size << endl;
-
-
     // bucketSort myBucket = bucketSort::bucketSort(arrRiskLevelBucket, counties.size(), "ascending");
      //float ret = myBucket.Sort(10);
 
 
     radixsort(arrRiskLevelRadix);
 
-    cout << endl << "BEGIN" << endl;
-
-    for (int i = 0; i < counties.size(); i++) {
-        cout << ((float)arrRiskLevelRadix[i] / (float)10000) << " ";
-    }
 
     auto ansRadix = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
+    auto ansRadixHigh = generalRiskLevelInv.find(((float)arrRiskLevelRadix[arrRiskLevelRadix.size() - 1] / (float)10000));
+
     //auto ansBucket = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
 
     cout << endl << "The dates and county with lowest risk level are  : " << ansRadix->second.second << "   " << ansRadix->second.first.first << "  " << ansRadix->second.first.second << endl;
+
+    cout << endl << "The dates and county with highest risk level are  : " << ansRadixHigh->second.second << "   " << ansRadixHigh->second.first.first << "  " << ansRadixHigh->second.first.second << endl;
 
     // cout << endl << "The county with the lowest risk using radix is : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
 
@@ -489,7 +484,7 @@ int main()
             }
 
 
-            risk = roundf(risk * 100000) / 100000;  //Round to 5 decimals places
+            risk = roundf(risk * 10000) / 10000;  //Round to 5 decimals places
 
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
