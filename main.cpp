@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <array>
 #include <algorithm>
-
+#include <chrono>
 #pragma comment(lib, "urlmon.lib")
 
 using namespace std;
@@ -22,18 +22,14 @@ using namespace std;
 struct bucketSort {
 
     vector<float> myVect;
-    //int myCounties;
-    //float mySizeOf;
-   // string directionality;
+
 
 public:
 
     bucketSort(vector<float> vect1) {
 
         this->myVect = vect1;
-        // this->myCounties = counties;
-         //this->mySizeOf = sizeOf;
-        // this->directionality = ascending;
+
     }
 
     //float Sort();
@@ -48,23 +44,19 @@ vector<float> bucketSort::selectSort(vector<float> insVect) {
 
     vector<float> returnVec = insVect;
 
-    //for (int i = 0; i < insVect.size(); i++) {
-    //    returnVec.push_back(insVect.at(i));
-    //}
-    
     int replaceVal = 0;
     int tempLocation = 0;
     bool foundSwap;
 
     for (int j = 0; j < returnVec.size() - 1; j++) {
-        
+
         float minVal = returnVec.at(j);
         tempLocation = j;
         foundSwap = false;
 
         for (int k = j + 1; k < returnVec.size() - 1; k++) {
             if (returnVec.at(k) < minVal) {
-                
+
                 tempLocation = k;
                 //replaceVal = returnVec.at(j);
                 minVal = returnVec.at(k);
@@ -77,7 +69,7 @@ vector<float> bucketSort::selectSort(vector<float> insVect) {
             returnVec.at(j) = minVal;
             returnVec.at(tempLocation) = replaceVal;
         }
-        
+
     }
 
     return returnVec;
@@ -89,12 +81,28 @@ float bucketSort::Sort(int sizeBucket) {
     vector<vector<float>> finalVec(sizeBucket);
     int numOfBuckets = 0;
 
+    float maxVal = -99999;
+    float minVal = 99999;
+
+    for (int i = 0; i < myVect.size(); i++) {
+
+        if (myVect.at(i) < minVal) {
+            minVal = myVect.at(i);
+        }
+        if (myVect.at(i) > maxVal) {
+            maxVal = myVect.at(i);
+        }
+    }
+
+    float range = maxVal - minVal;
 
 
     for (int i = 0; i < myVect.size(); i++) {
 
 
-        int bucketPos = sizeBucket * (myVect.at(i));
+        int bucketPos = sizeBucket * (myVect.at(i)) / range;
+
+
 
         //cout << bucketPos;
 
@@ -116,9 +124,10 @@ float bucketSort::Sort(int sizeBucket) {
 
     for (int j = 0; j < returnVec.size(); j++) {
         if (!returnVec.at(j).empty()) {
-            returnVec.at(j) = selectSort(returnVec.at(j));
+            //returnVec.at(j) = selectSort(returnVec.at(j));
+            sort(returnVec.at(j).begin(), returnVec.at(j).end());
         }
-        
+
     }
 
 
@@ -232,14 +241,13 @@ void radixsort(vector<int>& arr) {
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    std::cout << "Hello, and welcome to the Anti-Travel Agency!" << endl << "Our goal is to inform you of the risk level of traveling, given the COVID-19 Pandemic \n";
 
-    cout << "The good version \n";
 
     // the URL to download from 
     string state;
 
-    cout << "Please enter the abbreviation of the state you wish to travel to (ex: CA):" << endl;
+    cout << endl <<"Please enter the abbreviation of the state you wish to travel to (ex: CA):" << endl;
     cin >> state;
     string str = "https://api.covidactnow.org/v2/county/" + state + ".timeseries.csv?apiKey=74106da3ec5c421e9ebb34ab44eb0d2e";
     wstring widestr = std::wstring(str.begin(), str.end());
@@ -278,6 +286,8 @@ int main()
     getline(file, line);
 
     //Retrieving all necessary data from API
+
+
 
     while (getline(file, line)) {
 
@@ -354,11 +364,12 @@ int main()
 
     }
 
+
+
     cout << endl << "Finished taking in input data" << endl << endl;
 
-    cout << rowNum << endl;
 
-    cout << data.size() << endl;
+    cout << "The number of data entries for this state is: "<< data.size() << endl;
 
     auto countiesIter = counties.begin();
 
@@ -426,7 +437,7 @@ int main()
                 generalRiskLevel[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
                 generalRiskLevelInv[risk] = make_pair(make_pair(iterList[c]->first.second, iter->first.second), iterList[c]->first.first);
 
-                if (risk != 0 || true) {
+                if (risk != 0 ) {
                     arrRiskLevelRadix.push_back(risk * 10000);
                     arrRiskLevelBucket.push_back(risk);
                 }
@@ -464,19 +475,24 @@ int main()
     float ret = myBucketCounties.Sort(10);
 
 
+
     radixsort(arrRiskLevelRadix);
 
 
     auto ansRadix = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
     auto ansRadixHigh = generalRiskLevelInv.find(((float)arrRiskLevelRadix[arrRiskLevelRadix.size() - 1] / (float)10000));
 
-    //auto ansBucket = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
+    auto ansBucket = generalRiskLevelInv.find(((float)arrRiskLevelBucket[0] / (float)10000));
+    auto ansBucketHigh = generalRiskLevelInv.find(((float)arrRiskLevelBucket[arrRiskLevelBucket.size() - 1] / (float)10000));
 
-    cout << endl << "The dates and county with lowest risk level are  : " << ansRadix->second.second << "   " << ansRadix->second.first.first << "  " << ansRadix->second.first.second << endl;
 
-    cout << endl << "The dates and county with highest risk level are  : " << ansRadixHigh->second.second << "   " << ansRadixHigh->second.first.first << "  " << ansRadixHigh->second.first.second << endl;
+    cout << endl << "The dates & county with lowest risk level (Radix) : " << ansRadix->second.second << "   " << ansRadix->second.first.first << "  " << ansRadix->second.first.second << endl;
 
-    // cout << endl << "The county with the lowest risk using radix is : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
+    cout << endl << "The dates & county with highest risk level (Radix) : " << ansRadixHigh->second.second << "   " << ansRadixHigh->second.first.first << "  " << ansRadixHigh->second.first.second << endl;
+
+    //cout << endl << "The dates & county with highest risk level (Bucket) : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
+
+    //cout << endl << "The dates & county with highest risk level (Bucket) : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
 
 
 
@@ -511,14 +527,6 @@ int main()
 
         if (numCase1 != data.end() && numCase2 != data.end()) {
 
-            /*
-            int start = numCase1->second, end = numCase2->second;
-            if (start == 0) {
-                start++;
-            }
-            float risk = (float)(end) / (float)(start);
-            */
-
             float risk = calculateRiskLevel(numCase1->second, numCase2->second);
 
             if (risk == 0) {
@@ -541,6 +549,8 @@ int main()
 
     auto iterRL = riskLevel.begin();
 
+    cout << endl << "The associated risk values for each county given these travel dates are: " << endl;
+
     while (iterRL != riskLevel.end()) {
         cout << iterRL->first << "   " << iterRL->second << endl;
         iterRL++;
@@ -548,12 +558,17 @@ int main()
 
 
 
+    std::chrono::steady_clock::time_point beginTimeB2 = std::chrono::steady_clock::now();
     bucketSort myBucketDate(bucketSortVect);
     ret = myBucketDate.Sort(10);
+    std::chrono::steady_clock::time_point endTimeB2 = std::chrono::steady_clock::now();
 
     qsort(arr1, counties.size(), sizeof(float), ascending);
 
+
+    std::chrono::steady_clock::time_point beginTimeR2 = std::chrono::steady_clock::now();
     radixsort(radixSortVect);
+    std::chrono::steady_clock::time_point endTimeR2 = std::chrono::steady_clock::now();
 
 
     cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)radixSortVect[0] / (float)10000))->second << endl;
@@ -561,6 +576,14 @@ int main()
     cout << endl << "The county with the lowest risk using bucket is : " << riskLevelInv.find(ret)->second << endl;
 
     cout << endl << "The county with the lowest risk using quick is : " << riskLevelInv.find(arr1[0])->second << endl;
+
+
+    cout << endl << "Time it takes to sort:" << endl;
+
+    cout << endl << "Radix sort: " << std::chrono::duration_cast<std::chrono::nanoseconds> (endTimeR2 - beginTimeR2).count() << "[ns]" << endl;
+    cout << endl << "Bucket sort: " << std::chrono::duration_cast<std::chrono::nanoseconds> (endTimeB2 - beginTimeB2).count() << "[ns]" << endl;
+
+
 
 
     if (!validDates) {
@@ -573,3 +596,6 @@ int main()
     return 0;
 
 }
+
+
+
