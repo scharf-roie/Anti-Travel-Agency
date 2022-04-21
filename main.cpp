@@ -474,9 +474,11 @@ int main()
     bucketSort myBucketCounties(arrRiskLevelBucket);
     float ret = myBucketCounties.Sort(10);
 
-
-
+    std::chrono::steady_clock::time_point beginTimeR1 = std::chrono::steady_clock::now();
     radixsort(arrRiskLevelRadix);
+    std::chrono::steady_clock::time_point endTimeR1 = std::chrono::steady_clock::now();
+
+    cout << endl << "Radix sort: " << std::chrono::duration_cast<std::chrono::nanoseconds> (endTimeR1 - beginTimeR1).count() << "[ns]" << endl;
 
 
     auto ansRadix = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
@@ -490,7 +492,7 @@ int main()
 
     cout << endl << "The dates & county with highest risk level (Radix) : " << ansRadixHigh->second.second << "   " << ansRadixHigh->second.first.first << "  " << ansRadixHigh->second.first.second << endl;
 
-    //cout << endl << "The dates & county with highest risk level (Bucket) : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
+  //  cout << endl << "The dates & county with highest risk level (Bucket) : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
 
     //cout << endl << "The dates & county with highest risk level (Bucket) : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
 
