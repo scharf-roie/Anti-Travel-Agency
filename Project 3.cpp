@@ -381,6 +381,8 @@ int main()
             if (store) {
 
                 float risk = calculateRiskLevel(iterList[c]->second, iter->second);
+                int riskDeci = (int)(risk * 10000);
+                risk = (float)riskDeci / (float)10000;  //Round to 5 decimals places
                 generalRiskLevel[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
                 generalRiskLevelInv[risk] = make_pair(make_pair(iterList[c]->first.second, iter->first.second), iterList[c]->first.first);
 
@@ -389,7 +391,7 @@ int main()
                     arrRiskLevelBucket.push_back(risk);
                 }
 
-   
+
 
             }
         }
@@ -411,15 +413,15 @@ int main()
         size += superIter->second.size();
 
         while (i2 != superIter->second.end()) {
-           // cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
+            // cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
             i2++;
         }
         superIter++;
 
     }
 
-    // bucketSort myBucket = bucketSort::bucketSort(arrRiskLevelBucket, counties.size(), "ascending");
-     //float ret = myBucket.Sort(10);
+    bucketSort myBucketCounties(arrRiskLevelBucket, counties.size(), "ascending");
+    float ret = myBucketCounties.Sort(10);
 
 
     radixsort(arrRiskLevelRadix);
@@ -483,13 +485,13 @@ int main()
                 validDates = false;
             }
 
-
-            risk = roundf(risk * 10000) / 10000;  //Round to 5 decimals places
+            int riskDeci = (int)(risk * 10000);
+            risk = (float)riskDeci / (float)10000;  //Round to 5 decimals places
 
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
-            radixSortVect[c] = (int)(risk*10000);
+            radixSortVect[c] = (int)(risk * 10000);
             bucketSortVect.push_back(risk);
             c++;
         }
@@ -504,10 +506,10 @@ int main()
         iterRL++;
     }
 
-  
 
-    bucketSort myBucket = bucketSort::bucketSort(bucketSortVect, counties.size(), "ascending");
-    float ret = myBucket.Sort(10);
+
+    bucketSort myBucketDate(bucketSortVect, counties.size(), "ascending");
+    ret = myBucketDate.Sort(10);
 
     qsort(arr1, counties.size(), sizeof(float), ascending);
 
