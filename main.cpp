@@ -16,40 +16,80 @@
 
 using namespace std;
 
+
+//Bucket Sort Implementation
+
 struct bucketSort {
 
     vector<float> myVect;
-    int myCounties;
+    //int myCounties;
     //float mySizeOf;
-    string directionality;
+   // string directionality;
 
 public:
 
-    bucketSort(vector<float> vect1, int counties, string ascending) {
+    bucketSort(vector<float> vect1) {
 
         this->myVect = vect1;
-        this->myCounties = counties;
-        //this->mySizeOf = sizeOf;
-        this->directionality = ascending;
+        // this->myCounties = counties;
+         //this->mySizeOf = sizeOf;
+        // this->directionality = ascending;
     }
 
-    float Sort();
+    //float Sort();
     float Sort(int size);
+    vector<float> selectSort(vector<float> insVect);
 
 };
 
-float bucketSort::Sort() {
 
-    vector<float> returnVec;
-    return 1;
 
-}
+vector<float> bucketSort::selectSort(vector<float> insVect) {
+
+    vector<float> returnVec = insVect;
+
+    //for (int i = 0; i < insVect.size(); i++) {
+    //    returnVec.push_back(insVect.at(i));
+    //}
+    
+    int replaceVal = 0;
+    int tempLocation = 0;
+    bool foundSwap;
+
+    for (int j = 0; j < returnVec.size() - 1; j++) {
+        
+        float minVal = returnVec.at(j);
+        tempLocation = j;
+        foundSwap = false;
+
+        for (int k = j + 1; k < returnVec.size() - 1; k++) {
+            if (returnVec.at(k) < minVal) {
+                
+                tempLocation = k;
+                //replaceVal = returnVec.at(j);
+                minVal = returnVec.at(k);
+                foundSwap = true;
+            }
+
+        }
+
+        if (foundSwap == true) {
+            returnVec.at(j) = minVal;
+            returnVec.at(tempLocation) = replaceVal;
+        }
+        
+    }
+
+    return returnVec;
+};
 
 float bucketSort::Sort(int sizeBucket) {
 
     vector<vector<float>> returnVec(sizeBucket);
     vector<vector<float>> finalVec(sizeBucket);
     int numOfBuckets = 0;
+
+
 
     for (int i = 0; i < myVect.size(); i++) {
 
@@ -59,23 +99,26 @@ float bucketSort::Sort(int sizeBucket) {
         //cout << bucketPos;
 
         if (bucketPos <= 0) {
-            cout << "\ninserting float smaller than bucket: " << myVect.at(i);
+            //cout << "\ninserting float smaller than bucket: " << myVect.at(i);
             returnVec.at(0).push_back(myVect.at(i));
         }
         else if (bucketPos >= sizeBucket) {
-            cout << "\ninserting float bigger than bucket: " << myVect.at(i);
+            //cout << "\ninserting float bigger than bucket: " << myVect.at(i);
             returnVec.at(sizeBucket - 1).push_back(myVect.at(i));
         }
         else {
             float insertFloat = myVect.at(i);
-            cout << "\ninserting float else: " << insertFloat;
+            //cout << "\ninserting float else: " << insertFloat;
             returnVec.at(float(bucketPos)).push_back(insertFloat);
         }
 
     }
 
     for (int j = 0; j < returnVec.size(); j++) {
-        sort(returnVec.at(j).begin(), returnVec.at(j).end());
+        if (!returnVec.at(j).empty()) {
+            returnVec.at(j) = selectSort(returnVec.at(j));
+        }
+        
     }
 
 
@@ -90,6 +133,9 @@ float bucketSort::Sort(int sizeBucket) {
     return finalVec.at(0).at(0);
 
 }
+
+
+//Risk Class
 
 struct riskInformation {
     int numCases; //9 value
@@ -119,17 +165,26 @@ int ascending(const void* x, const void* y) {
     return (*(float*)(x) * 100000 - *(float*)(y) * 100000);
 }
 
+//Risk calculation
+
 float calculateRiskLevel(riskInformation* r1, riskInformation* r2) {
     float caseRatio = ((float)r2->numCases / (float)r1->numCases);
-    float caseGrowthFactor = ((r2->casePerHundredK - r1->casePerHundredK) / (r2->caseDensity - r1->caseDensity + 1));
-    float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2) * (r2->caseDensity - r1->caseDensity);
+    float positivityRatioAvg = ((float)r1->positivityRatio + r2->positivityRatio) / 2.0;
+    float caseDensityAvg = ((float)r1->caseDensity + r2->caseDensity) / 2.0;
+    float vaccineNormalization = ((r2->vaccinationsCompleted + r1->vaccinationsCompleted) / 2.0) * caseDensityAvg;
 
-    // cout << caseRatio << "  " << caseGrowthFactor << "   " << vaccineNormalization << endl;
+    //cout << caseRatio << "  " << positivityRatioAvg  <<  "   " << caseDensityAvg<< "  " << vaccineNormalization << endl;
 
-    float risk = caseRatio + caseGrowthFactor - vaccineNormalization;
+    float risk = caseRatio + positivityRatioAvg + caseDensityAvg - vaccineNormalization;
 
+    if (risk < -1000 || risk > 1000) {
+        return 0;
+    }
     return risk;
 }
+
+
+//Radix Sort Implementation
 
 int getMax(vector<int> arr) {
     int max = arr[0];
@@ -158,7 +213,7 @@ void countSort(vector<int>& arr, int exp) {
 
     for (int i = (arr.size() - 1); i >= 0; i--) { //O(n)
         newArr[temp[(arr[i] / exp) % 10] - 1] = arr[i]; //create sorted array
-        temp[(arr[i] / exp) % 10]--; 
+        temp[(arr[i] / exp) % 10]--;
     }
 
     for (int i = 0; i < arr.size(); i++) { //O(n)
@@ -172,8 +227,8 @@ void radixsort(vector<int>& arr) {
     for (int exp = 1; max / exp > 0; exp *= 10) { //number of passes based on every digit
         countSort(arr, exp);
     }
-}
 
+}
 
 int main()
 {
@@ -222,6 +277,8 @@ int main()
 
     getline(file, line);
 
+    //Retrieving all necessary data from API
+
     while (getline(file, line)) {
 
         stringstream row(line);
@@ -252,6 +309,7 @@ int main()
                     cases += stoi(entry);
                     hasData = true;
                 }
+
 
             }
 
@@ -300,21 +358,6 @@ int main()
 
     cout << rowNum << endl;
 
-
-    //Checking to see what the containers look like
-
-    /*
-    auto iter = data.begin();
-    while (iter != data.end()) {
-        //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
-        iter++;
-    }
-    auto iter2 = data2.begin();
-    while (iter2 != data2.end()) {
-    //cout << iter->first.first << "  " << iter->first.second << "  " << iter->second << endl;
-    iter2++;
-    }*/
-
     cout << data.size() << endl;
 
     auto countiesIter = counties.begin();
@@ -326,8 +369,6 @@ int main()
         countiesIter++;
     }
 
-
-
     file.close();
 
     cout << endl << "For how many days will you travel?" << endl;
@@ -338,16 +379,19 @@ int main()
 
     map<pair<string, string>, riskInformation*>::iterator* iterList = new map<pair<string, string>, riskInformation*>::iterator[len];
     map < string, map<pair<string, string>, float> > generalRiskLevel;
-    //map <  map<pair<string, string>, float>, string > generalRiskLevelInv;
+    map <float, pair<pair<string, string>, string>> generalRiskLevelInv;
 
 
-    float* arrRiskLevel = new float[data.size() - len];
 
-
+    vector<int> arrRiskLevelRadix;
+    vector<float> arrRiskLevelBucket;
 
     auto iter = data.begin();
-    int i = 0, arrCounter = 0;
+    int i = 0;
     bool store = false;
+
+
+    //Generation of Risk Level Map for every possible date and county
 
     while (iter != data.end()) {
         int c = i;
@@ -376,17 +420,19 @@ int main()
         if (iterList[c]->first.first.compare(iter->first.first) == 0) {
             if (store) {
 
-                /*
-                int startDate = iterList[c]->second; //risk
-                if (startDate == 0) {
-                    startDate++;
-                }
-                float risk = (float)iter->second / startDate;*/
-
                 float risk = calculateRiskLevel(iterList[c]->second, iter->second);
+                int riskDeci = (int)(risk * 10000);
+                risk = (float)riskDeci / (float)10000;  //Round to 5 decimals places
                 generalRiskLevel[iterList[c]->first.first][make_pair(iterList[c]->first.second, iter->first.second)] = risk;
-                arrRiskLevel[arrCounter] = risk;
-                arrCounter++;
+                generalRiskLevelInv[risk] = make_pair(make_pair(iterList[c]->first.second, iter->first.second), iterList[c]->first.first);
+
+                if (risk != 0 || true) {
+                    arrRiskLevelRadix.push_back(risk * 10000);
+                    arrRiskLevelBucket.push_back(risk);
+                }
+
+
+
             }
         }
         else {
@@ -396,6 +442,7 @@ int main()
 
     }
 
+    // Prints out the generated Risk Level Map
 
     auto superIter = generalRiskLevel.begin();
     int size = 0;
@@ -403,36 +450,37 @@ int main()
     while (superIter != generalRiskLevel.end()) {
         auto i2 = superIter->second.begin();
 
-        cout << endl << superIter->second.size() << endl;
         size += superIter->second.size();
 
         while (i2 != superIter->second.end()) {
-            cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
+            // cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
             i2++;
         }
         superIter++;
 
     }
 
-    cout << endl << size << endl;
+    bucketSort myBucketCounties(arrRiskLevelBucket);
+    float ret = myBucketCounties.Sort(10);
 
-    //This isnt working properly
 
-    /*
-    qsort(arrRiskLevel, data.size(), sizeof(float), ascending);
-    for (int i = 0; i < counties.size(); i++)
-        cout << arrRiskLevel[i] << " ";
-    superIter = generalRiskLevel.begin();
-    while (superIter != generalRiskLevel.end()) {
-        auto i2 = superIter->second.begin();
-        while (i2 != superIter->second.end()) {
-            if (i2->second == arrRiskLevel[0]) {
-                cout << superIter->first << "  " << i2->first.first << " " << i2->first.second << "  " << i2->second << endl;
-            }
-            i2++;
-        }
-        superIter++;
-    }*/
+    radixsort(arrRiskLevelRadix);
+
+
+    auto ansRadix = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
+    auto ansRadixHigh = generalRiskLevelInv.find(((float)arrRiskLevelRadix[arrRiskLevelRadix.size() - 1] / (float)10000));
+
+    //auto ansBucket = generalRiskLevelInv.find(((float)arrRiskLevelRadix[0] / (float)10000));
+
+    cout << endl << "The dates and county with lowest risk level are  : " << ansRadix->second.second << "   " << ansRadix->second.first.first << "  " << ansRadix->second.first.second << endl;
+
+    cout << endl << "The dates and county with highest risk level are  : " << ansRadixHigh->second.second << "   " << ansRadixHigh->second.first.first << "  " << ansRadixHigh->second.first.second << endl;
+
+    // cout << endl << "The county with the lowest risk using radix is : " << ansBucket->second.second << "   " << ansBucket->second.first.first << "  " << ansBucket->second.first.second << endl;
+
+
+
+     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     string start, end;
 
@@ -444,13 +492,15 @@ int main()
     unordered_map<string, float> riskLevel;
     unordered_map<float, string> riskLevelInv;
 
-    float* arr1 = new float[counties.size()];
-    vector<int> arr2;
-    arr2.resize(counties.size());
-    //int* arr2 = new int[counties.size()];
+    float* arr1 = new float[counties.size()]; //qsort
+    vector<int> radixSortVect;
+    radixSortVect.resize(counties.size());
+    vector<float> bucketSortVect;
 
     int c = 0;
     countiesIter = counties.begin();
+
+    bool validDates = true;
 
     while (countiesIter != counties.end()) {
         pair<string, string> key = make_pair(*countiesIter, start);
@@ -466,14 +516,23 @@ int main()
             if (start == 0) {
                 start++;
             }
-            float risk = (float)(end) / (float)(start);*/
+            float risk = (float)(end) / (float)(start);
+            */
 
             float risk = calculateRiskLevel(numCase1->second, numCase2->second);
-            risk = roundf(risk * 100000) / 100000;  //Round to 5 decimals places
+
+            if (risk == 0) {
+                validDates = false;
+            }
+
+            int riskDeci = (int)(risk * 10000);
+            risk = (float)riskDeci / (float)10000;  //Round to 5 decimals places
+
             riskLevel[*countiesIter] = risk;
             riskLevelInv[risk] = *countiesIter;
             arr1[c] = risk;
-            arr2[c] = (int)(risk * 100000);
+            radixSortVect[c] = (int)(risk * 10000);
+            bucketSortVect.push_back(risk);
             c++;
         }
 
@@ -487,44 +546,29 @@ int main()
         iterRL++;
     }
 
-    int iterArray = 0;
-    vector<float> bucketSortVect;
-    while (iterArray < counties.size()) {
-
-        bucketSortVect.push_back(arr1[iterArray]);
-
-        iterArray++;
-    }
-
-    bucketSort myBucket = bucketSort::bucketSort(bucketSortVect, counties.size(), "ascending");
-    float ret = myBucket.Sort(10);
-
-    //qsort(arr1, counties.size(), sizeof(float), ascending);
 
 
-    /*
-    for (int i = 0; i < counties.size(); i++)
-        cout << arr1[i] << " ";
-    */
+    bucketSort myBucketDate(bucketSortVect);
+    ret = myBucketDate.Sort(10);
 
-    //radix arr2
+    qsort(arr1, counties.size(), sizeof(float), ascending);
 
-    radixsort(arr2);
+    radixsort(radixSortVect);
 
-    //cout << endl << "BEGIN" << endl;
 
-    //for (int i = 0; i < counties.size(); i++) {
-    //    cout << ((float)arr2[i] / (float)100000) << " ";
-    //}
-    
-
-    cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)arr2[0] / (float)100000))->second << endl;
+    cout << endl << "The county with the lowest risk using radix is : " << riskLevelInv.find(((float)radixSortVect[0] / (float)10000))->second << endl;
 
     cout << endl << "The county with the lowest risk using bucket is : " << riskLevelInv.find(ret)->second << endl;
 
-    //qsort(arr1, counties.size(), sizeof(float), ascending);
-    //cout << endl << "The county with the lowest risk using quick is : " << riskLevelInv.find(arr1[0])->second << endl;
+    cout << endl << "The county with the lowest risk using quick is : " << riskLevelInv.find(arr1[0])->second << endl;
 
+
+    if (!validDates) {
+
+
+        cout << "However, these specific travel dates have unreliable information. We suggest you choose other dates." << endl;
+
+    }
 
     return 0;
 
