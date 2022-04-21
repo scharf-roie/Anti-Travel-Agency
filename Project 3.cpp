@@ -22,18 +22,12 @@ using namespace std;
 struct bucketSort {
 
     vector<float> myVect;
-    //int myCounties;
-    //float mySizeOf;
-   // string directionality;
 
 public:
 
-    bucketSort(vector<float> vect1, int counties, string ascending) {
+    bucketSort(vector<float> vect1) {
 
         this->myVect = vect1;
-        // this->myCounties = counties;
-         //this->mySizeOf = sizeOf;
-        // this->directionality = ascending;
     }
 
     float Sort();
@@ -62,16 +56,16 @@ float bucketSort::Sort(int sizeBucket) {
         //cout << bucketPos;
 
         if (bucketPos <= 0) {
-            cout << "\ninserting float smaller than bucket: " << myVect.at(i);
+            //cout << "\ninserting float smaller than bucket: " << myVect.at(i);
             returnVec.at(0).push_back(myVect.at(i));
         }
         else if (bucketPos >= sizeBucket) {
-            cout << "\ninserting float bigger than bucket: " << myVect.at(i);
+            //cout << "\ninserting float bigger than bucket: " << myVect.at(i);
             returnVec.at(sizeBucket - 1).push_back(myVect.at(i));
         }
         else {
             float insertFloat = myVect.at(i);
-            cout << "\ninserting float else: " << insertFloat;
+           // cout << "\ninserting float else: " << insertFloat;
             returnVec.at(float(bucketPos)).push_back(insertFloat);
         }
 
@@ -420,7 +414,7 @@ int main()
 
     }
 
-    bucketSort myBucketCounties(arrRiskLevelBucket, counties.size(), "ascending");
+    bucketSort myBucketCounties(arrRiskLevelBucket);
     float ret = myBucketCounties.Sort(10);
 
 
@@ -508,7 +502,7 @@ int main()
 
 
 
-    bucketSort myBucketDate(bucketSortVect, counties.size(), "ascending");
+    bucketSort myBucketDate(bucketSortVect);
     ret = myBucketDate.Sort(10);
 
     qsort(arr1, counties.size(), sizeof(float), ascending);
