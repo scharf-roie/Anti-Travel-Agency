@@ -528,6 +528,7 @@ int main()
 
     if (!validDates) {
 
+
         cout << "However, these specific travel dates have unreliable information. We suggest you choose other dates." << endl;
 
     }
